@@ -1,0 +1,9 @@
+{
+  "devDependencies": {
+    "tailwindcss": "^3.4.19"
+  },
+  "scripts": {
+    "build": "tailwindcss -i task_tracker/static/tailwind/input.css -o task_tracker/static/tailwind/output.css --minify",
+    "watch": "tailwindcss -i task_tracker/static/tailwind/input.css -o task_tracker/static/tailwind/output.css --watch --poll"
+  }
+}

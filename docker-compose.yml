@@ -1,0 +1,54 @@
+services:
+  postgres:
+    image: postgres:alpine
+    environment:
+      POSTGRES_DB: ${DB_NAME:-mydb}
+      POSTGRES_USER: ${DB_USER:-admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-mypassword}
+      TZ: ${TZ:-UTC}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-admin} -d ${DB_NAME:-mydb}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  django:
+    build: .
+    working_dir: /app
+    volumes:
+      - ./task_tracker:/app
+    command: >
+      sh -c "python manage.py makemigrations &&
+             python manage.py migrate --noinput &&
+             python manage.py runserver 0.0.0.0:8001 --verbosity 2"
+    ports:
+      - "8001:8001"
+    depends_on:
+      - postgres
+    environment:
+      - DATABASE_URL=postgres://${DB_USER:-admin}:${DB_PASSWORD:-mypassword}@postgres:5432/${DB_NAME:-mydb}
+      - SECRET_KEY=${SECRET_KEY:-dev-secret-key-change-me}
+      - DEBUG=${DEBUG:-True}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1,0.0.0.0}
+    env_file:
+      - ./.env
+
+  tailwind:
+    build:
+      context: .
+      dockerfile: Dockerfile.tailwind
+    container_name: tailwind
+    working_dir: /app
+    volumes:
+      - ./task_tracker:/app/task_tracker
+      - node_modules:/app/node_modules
+    tty: true
+
+volumes:
+  postgres_data:
+  node_modules:

@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block body %}
+<div class="min-h-screen flex items-center justify-center bg-sidebar-aaaa">
+  <div class="bg-sidebar-aaaa-onhover py-9 px-20 flex flex-col gap-lg rounded-md shadow-xl w-full max-w-md">
+    <p class="text-sidebar-aaaa-text font-bold text-center text-xl">Авторизация</p>
+    
+    <form method="post" class="flex flex-col gap-md">
+      {% csrf_token %}
+      
+      <div class="flex flex-col gap-sm">
+        <label for="{{ form.username.id_for_label }}" class="text-sidebar-aaaa-text text-sm font-medium">
+          Логин
+        </label>
+        {{ form.username }}
+        {% if form.username.errors %}
+          <p class="text-error text-xs mt-1">{{ form.username.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <div class="flex flex-col gap-sm">
+        <label for="{{ form.password.id_for_label }}" class="text-sidebar-aaaa-text text-sm font-medium">
+          Пароль
+        </label>
+        {{ form.password }}
+        {% if form.password.errors %}
+          <p class="text-error text-xs mt-1">{{ form.password.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      {% if form.non_field_errors %}
+        <div class="bg-red-900/30 border border-red-500 rounded-md p-2 text-center">
+          {% for error in form.non_field_errors %}
+            <p class="text-error text-sm">{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <button type="submit" 
+              class="mt-2 w-full bg-primary text-white font-semibold py-2.5 rounded-md 
+                     hover:bg-opacity-90 transition duration-200 focus:outline-none 
+                     focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-sidebar-aaaa-onhover">
+        Войти
+      </button>
+      <div class="text-center text-sidebar-aaaa-text text-sm mt-2">
+      Нет аккаунта? 
+      <a href="{% url 'registration' %}" 
+         class="text-primary hover:text-opacity-80 underline-offset-2 hover:underline transition duration-200">
+        Зарегистрироваться
+      </a>
+    </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

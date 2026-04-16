@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="ru">
+    <head>
+        <link rel="stylesheet" href="{% static 'tailwind/output.css' %}">
+        <link rel="stylesheet" href="{% static 'FAS/css/all.css' %}">
+        <link rel="stylesheet" href="{% static 'css/base.css' %}">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script type="module" src="{% static 'js/base.js' %}"></script>
+        {% block head %}
+        {% endblock %}
+    </head>
+    <body class="font-comic">
+        <div class="flex">
+            <div class="bg-sidebar-aaaa text-sidebar-aaaa-text transition-all duration-300 ease-in-out min-h-screen flex flex-col gap-2 text-md shadow-md"
+                 id="menu">
+                <div class="flex items-center justify-start px-5 py-3 hover:bg-white/10 transition-colors duration-200 cursor-pointer" id="menuButton">
+                    <i class="fa-solid fa-grip-lines text-lg"></i>
+                </div>
+                <div class="flex flex-col font-bold text-sm">
+                    <div class="link hover:bg-sidebar-aaaa-onhover text-center h-12 transition-colors duration-200 flex gap-4 items-center justify-start px-5 cursor-pointer" data-url='/account/home'>
+                        <i class="fa-solid fa-user w-5 text-center"></i>
+                        <p class="text-sm whitespace-nowrap transition-opacity duration-300" id="accountText">Аккаунт</p>
+                    </div>
+                    <div class="link hover:bg-sidebar-aaaa-onhover text-center h-12 transition-colors duration-200 flex gap-4 items-center justify-start px-5 cursor-pointer" data-url='/projects/'>
+                        <i class="fa-solid fa-diagram-project w-5 text-center"></i>
+                        <p class="text-sm whitespace-nowrap transition-opacity duration-300" id="projectText">Проекты</p>
+                    </div>
+                    <div class="link hover:bg-sidebar-aaaa-onhover text-center h-12 transition-colors duration-200 flex gap-4 items-center justify-start px-5 cursor-pointer" data-url='/tasks/'>
+                        <i class="fa-solid fa-list-check w-5 text-center"></i>
+                        <p class="text-sm whitespace-nowrap transition-opacity duration-300" id="taskText">Задачи</p>
+                    </div>
+                    <p class="text-xs text-center text-sidebar-aaaa font-bold mt-2 opacity-80">made by Walkerin</p>
+                </div>
+            </div>
+            <!-- Контент -->
+            <div class="flex-1">
+                {% block body %}
+                {% endblock %}
+            </div>
+        </div>
+        {% block scripts %}
+        {% endblock %}
+    </body>
+</html>

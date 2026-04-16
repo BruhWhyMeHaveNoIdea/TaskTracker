@@ -1,0 +1,10 @@
+1. Create API + Serializers + Swagger
+    1. Create Serializers for Models
+    2. Create API for Project
+    3. Create Swagger
+
+    
+2. Creation for Task/Project creation
+    1. Forms for Task/Project
+    2. "Create" button on main Project/Task page
+    3. Window for creating new Project/Task
