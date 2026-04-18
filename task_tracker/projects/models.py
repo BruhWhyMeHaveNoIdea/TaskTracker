@@ -5,9 +5,9 @@ class Project(models.Model):
     name = models.CharField(max_length=255, verbose_name="Название проекта")
     description = models.TextField(verbose_name="Описание проекта")
     creator = models.ForeignKey(to="account.CustomUser", on_delete=models.SET_NULL, null=True, related_name="created_projects", verbose_name="Создатель проекта")
-    participants = models.ManyToManyField(to="account.CustomUser", related_name="participated_projects", verbose_name="Участники проекта")
-    created_at = models.DateTimeField(verbose_name="Дата и время создания")
-    updated_at = models.DateTimeField(verbose_name="Дата и время обновления")
+    participants = models.ManyToManyField(to="account.CustomUser", related_name="participated_projects", verbose_name="Участники проекта", null=True)
+    created_at = models.DateTimeField(verbose_name="Дата и время создания", auto_now_add=True)
+    updated_at = models.DateTimeField(verbose_name="Дата и время обновления", auto_now=True)
     tasks = models.ManyToManyField(to="tasks.Task", related_name="projects", verbose_name="Задачи проекта")
     STATUS_CHOICES = [
         ('draft', 'Черновик'),

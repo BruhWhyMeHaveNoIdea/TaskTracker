@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Task
+from projects.models import Project
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 
@@ -7,7 +8,9 @@ from django.contrib.auth.decorators import login_required
 @login_required
 def main(request):
     tasks = Task.objects.filter(Q(executor = request.user.id) | Q(creator = request.user.id) | Q(projects__participants=request.user.id)).distinct()
-    return render(request, "tasks/main.html", context={"tasks":tasks})
+    projects = Project.objects.filter(Q(participants = request.user)).distinct()
+    print('pr', projects)
+    return render(request, "tasks/main.html", context={"tasks":tasks, "projects": projects})
 
 @login_required
 def detail(request, task_id):
