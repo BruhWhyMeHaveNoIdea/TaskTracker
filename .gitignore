@@ -3,6 +3,60 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+# --- Python / Django ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.venv/
+.ENV/
+*.egg-info/
+dist/
+build/
+*.egg
+db.sqlite3
+*.log
+
+# --- Переменные окружения ---
+.env
+.env.local
+.env.*.local
+
+# --- IDE ---
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# --- Node.js / Tailwind ---
+node_modules/
+npm-debug.log*
+
+# --- Docker ---
+# .env уже выше, но можно продублировать
+.docker/
+
+# --- Статика (сгенерированная) ---
+task_tracker/static/tailwind/output.css
+task_tracker/staticfiles/
+
+# --- Тесты и покрытие ---
+htmlcov/
+.coverage
+.pytest_cache/
+.tox/
+
+# --- Секреты и ключи ---
+*.pem
+*.key
+*.crt
+secrets/
+
 # C extensions
 *.so
 
