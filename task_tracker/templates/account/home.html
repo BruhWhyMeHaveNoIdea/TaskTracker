@@ -3,14 +3,14 @@
 
 {% block body %}
 <div class="flex-1 min-h-screen">
-    <div class="px-6 py-6">
-        <div class="flex justify-between items-center border-b-2 border-border-aaaa rounded-b-sm px-3 shadow-md pb-2">
-            <div class="flex gap-sm text-3xl">
+    <div class="p-8">
+        <div class="flex justify-between items-center border-b-2 border-border-aaaa rounded-b-sm pb-2 font-bold">
+            <div class="text-3xl mb-6 flex gap-sm">
                 <p class="">Добро пожаловать,</p>
                 <p class="font-bold">{{user.first_name}} {{user.last_name}}</p>
             </div>
-            <div class="flex flex-col items-center justify-center">
-                <div class="text-lg">
+            <div class="flex gap-lg items-center justify-center">
+                <div class="text-lg shadow-sm rounded-md">
                     <p class="font-bold" id="currentTime"></p>
                 </div>
                 <div class="text-lg cursor-pointer transition-opacity duration-200 hover:shadow-sm hover:text-text-error">

@@ -8,3 +8,42 @@
     1. Forms for Task/Project
     2. "Create" button on main Project/Task page
     3. Window for creating new Project/Task
+
+Project actions:
+    Status change
+    Members change(add/delete)
+    delete
+
+Task actions:
+    Status change
+    Members add/delete
+    Close option (for creator)
+    Delete
+
+
+
+Документация API (Swagger/Redoc) — полностью отсутствует
+
+Нет установленных пакетов drf-spectacular или drf-yasg
+Нет конфигурации в settings.py
+Нет URL endpoints для документации
+Гранулярные права доступа — реализованы частично/неправильно:
+
+Нет разделения прав для владельца проекта, исполнителя, автора
+В API нет проверок: кто может редактировать/удалять задачи
+Нет ограничений на редактирование только определённых полей разными ролями
+Фильтрация в API — отсутствует:
+
+Нет фильтрации задач по проекту, статусу, приоритету, исполнителю, дедлайну через API
+Нет пагинации в API responses
+Валидация сериализаторов — недостаточная:
+
+Нет валидации, что исполнитель должен быть участником проекта
+Нет ограничений на значения priority/status
+README — отсутствует:
+
+Нет файла README.md с описанием запуска проекта
+Комментарии к задачам — есть модель, но нет API:
+
+Модель Comment существует
+Но нет API endpoints для работы с комментариями

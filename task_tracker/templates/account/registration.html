@@ -16,7 +16,7 @@
         </label>
         {{ form.username }}
         {% if form.username.errors %}
-          <p class="text-error text-xs mt-1">{{ form.username.errors.0 }}</p>
+          <p class="text-error text-xs mt-1 font-bold text-white">{{ form.username.errors.0 }}</p>
         {% endif %}
       </div>
 
@@ -26,7 +26,7 @@
         </label>
         {{ form.first_name }}
         {% if form.first_name.errors %}
-          <p class="text-error text-xs mt-1">{{ form.first_name.errors.0 }}</p>
+          <p class="text-error text-xs mt-1 font-bold text-white">{{ form.first_name.errors.0 }}</p>
         {% endif %}
       </div>
 
@@ -36,7 +36,7 @@
         </label>
         {{ form.last_name }}
         {% if form.last_name.errors %}
-          <p class="text-error text-xs mt-1">{{ form.last_name.errors.0 }}</p>
+          <p class="text-error text-xs mt-1 font-bold text-white">{{ form.last_name.errors.0 }}</p>
         {% endif %}
       </div>
 
@@ -46,7 +46,7 @@
         </label>
         {{ form.middle_name }}
         {% if form.middle_name.errors %}
-          <p class="text-error text-xs mt-1">{{ form.middle_name.errors.0 }}</p>
+          <p class="text-error text-xs mt-1 font-bold text-white">{{ form.middle_name.errors.0 }}</p>
         {% endif %}
       </div>
 
@@ -56,7 +56,7 @@
         </label>
         {{ form.email }}
         {% if form.email.errors %}
-          <p class="text-error text-xs mt-1">{{ form.email.errors.0 }}</p>
+          <p class="text-error text-xs mt-1 font-bold text-white">{{ form.email.errors.0 }}</p>
         {% endif %}
       </div>
 
@@ -66,7 +66,7 @@
         </label>
         {{ form.password1 }}
         {% if form.password1.errors %}
-          <p class="text-error text-xs mt-1">{{ form.password1.errors.0 }}</p>
+          <p class="text-error text-xs mt-1 font-bold text-white">{{ form.password1.errors.0 }}</p>
         {% endif %}
       </div>
 
@@ -76,14 +76,14 @@
         </label>
         {{ form.password2 }}
         {% if form.password2.errors %}
-          <p class="text-error text-xs mt-1">{{ form.password2.errors.0 }}</p>
+          <p class="text-error text-xs mt-1 font-bold text-white">{{ form.password2.errors.0 }}</p>
         {% endif %}
       </div>
 
       {% if form.non_field_errors %}
         <div class="bg-red-900/30 border border-red-500 rounded-md p-2 text-center">
           {% for error in form.non_field_errors %}
-            <p class="text-error text-sm">{{ error }}</p>
+            <p class="text-error text-sm font-bold text-white">{{ error }}</p>
           {% endfor %}
         </div>
       {% endif %}

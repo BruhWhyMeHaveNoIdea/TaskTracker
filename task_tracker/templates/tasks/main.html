@@ -7,6 +7,9 @@
 
 {% block body %}
 <div class="p-8">
+    <div class="notification fixed bottom-4 right-4 min-w-[250px] max-w-md bg-blue-500 rounded-md text-center px-6 py-3 text-white shadow-lg transition-all duration-500 opacity-0 invisible pointer-events-none z-[9999]" id="notificationWindow">
+        <p id="notificationText"></p>
+    </div>
     <div class="flex justify-between items-center border-b-2 border-border-aaaa rounded-b-sm pb-2 font-bold">
         <h1 class="text-3xl mb-6">Все задачи</h1>
         <div class="px-2 py-1 bg-blue-500 rounded-lg text-white hover:bg-blue-600 transition-colors duration-200 cursor-pointer flex gap-sm items-center" id="addTask">
@@ -17,15 +20,62 @@
     {% if tasks %}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {% for task in tasks %}
-        <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
-            <h2 class="text-xl font-bold mb-2">{{ task.name }}</h2>
+        <div class="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow duration-200 relative">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold mb-2">{{ task.name }}</h2>
+                <div class="relative" id="actions-container-{{task.id}}">
+                    <button class="rounded-full hover:bg-[black]/10 hover:shadow-md transition-colors px-2 py-1 w-8 h-8 flex items-center justify-center" 
+                            id="actions-btn-{{task.id}}"
+                            data-task="{{task.id}}"
+                            type="button">
+                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                    </button>
+                
+                    <div class="hidden absolute right-0 top-10 w-56 bg-white rounded-lg shadow-lg z-50 border border-gray-200" 
+                         id="actions-menu-{{task.id}}">
+                        <button class="action-item w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
+                                data-action="add-executor">
+                            <i class="fa-solid fa-user-plus"></i>
+                            Добавить исполнителя
+                        </button>
+                    
+                        <div class="relative group/sub">
+                            <button class="action-item w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 justify-between"
+                                    data-action="change-status"
+                                    type="button">
+                                <span class="flex items-center gap-2">
+                                    <i class="fa-solid fa-bars-progress"></i>
+                                    Сменить статус
+                                </span>
+                                <i class="fa-solid fa-chevron-right text-xs"></i>
+                            </button>
+                        
+                            <div class="hidden group-hover/sub:block absolute right-full top-0 ml-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
+                                 id="status-menu-{{task.id}}">
+                                <button class="status-option w-full text-left px-4 py-2 hover:bg-gray-100" data-status="in_progress">В работе</button>
+                                <button class="status-option w-full text-left px-4 py-2 hover:bg-gray-100" data-status="review">На проверке</button>
+                                <button class="status-option w-full text-left px-4 py-2 hover:bg-gray-100" data-status="done">Завершена</button>
+                                <button class="status-option w-full text-left px-4 py-2 hover:bg-gray-100" data-status="cancelled">Отменена</button>
+                            </div>
+                        </div>
+                    
+                        <button class="action-item w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-red-600 hover:text-red-700"
+                                data-action="delete"
+                                {% if task.creator.username != user.username %}disabled{% endif %}>
+                            <i class="fa-solid fa-trash"></i>
+                            Удалить
+                        </button>
+                    </div>
+                </div>
+            </div>
+        
             <p class="text-gray-600 mb-4">{{ task.description|truncatewords:20 }}</p>
             
             <div class="text-sm text-gray-500 mb-2">
                 <i class="fa-solid fa-user mr-2"></i>
                 <strong>Создатель:</strong> {{ task.creator.first_name }} {{task.creator.last_name}} ({{task.creator.username}})
             </div>
-
+        
             <div class="text-sm text-gray-500 mb-2">
                 <i class="fa-solid fa-users mr-2"></i>
                 <strong>Назначено:</strong> {{ task.executor.count | default:"Неизвестно"}}
@@ -60,6 +110,34 @@
     </div>
     {% endif %}
 </div>
+
+<dialog id="executorModal" class="rounded-lg shadow-xl p-6 bg-white w-[400px] [&::backdrop]:bg-black/40">
+    <form id="executorForm">
+        <h2 class="text-xl font-bold mb-4 text-gray-800">Добавить исполнителя</h2>
+        <div class="mb-4">
+            <label for="executorUsername" class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+            <input type="text" 
+                   name="username" 
+                   id="executorUsername" 
+                   required 
+                   placeholder="Введите username пользователя"
+                   class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div id="executorFormErrors" class="hidden mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-sm"></div>
+        <div class="flex gap-2 justify-end">
+            <button type="button" id="cancelBtn-executor" 
+                    class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
+                Отмена
+            </button>
+            <button type="submit" 
+                    class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                Добавить
+            </button>
+        </div>
+    </form>
+</dialog>
+
+
 <dialog id="taskModal" class="rounded-lg shadow-xl p-6 bg-blue-100 w-[600px] [&::backdrop]:bg-black/40">
     <form id="taskForm">
         <h2 class="text-xl font-bold mb-4">Создать задачу</h2>
@@ -71,6 +149,11 @@
         <div class="mb-4">
             <label for="taskDescription" class="block text-sm font-medium mb-1">Описание:</label>
             <textarea name="description" id="taskDescription" rows="3"
+                  class="border rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+        </div>
+        <div class="mb-4">
+            <label for="taskPriority" class="block text-sm font-medium mb-1">Приоритет:</label>
+            <textarea name="priority" id="taskPriority" rows="3"
                   class="border rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
         </div>
         <div class="mb-4">
@@ -96,20 +179,20 @@
         </div>
         <div id="formErrors" class="hidden mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded"></div>
         <div class="flex gap-2 justify-end">
-        <button type="button" id="cancelBtn" 
-                class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition-colors">
-            Отмена
-        </button>
-        <button type="submit" 
-                class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
-            Создать
-        </button>
-    </div>
+            <button type="button" id="cancelBtn-task" 
+                    class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition-colors">
+                Отмена
+            </button>
+            <button type="submit" 
+                    class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
+                Создать
+            </button>
+        </div>
     </form>
 </dialog>
 
 {% endblock %}
 
 {% block scripts %}
-    <script src="{% static 'js/tasks/script.js' %}"></script>
+    <script src="{% static 'js/tasks/main.js' %}"></script>
 {% endblock %}

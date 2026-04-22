@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block head %}
 <title>{{ task.name }}</title>
@@ -9,25 +10,68 @@
     <a href="{% url 'tasks:list' %}" class="text-blue-500 hover:underline mb-4 inline-block">
         <i class="fa-solid fa-arrow-left mr-2"></i>Назад к задачам
     </a>
-    
+    <div class="notification fixed bottom-4 right-4 min-w-[250px] max-w-md bg-blue-500 rounded-md text-center px-6 py-3 text-white shadow-lg transition-all duration-500 opacity-0 invisible pointer-events-none z-[9999]" id="notificationWindow">
+        <p id="notificationText"></p>
+    </div>
     <div class="bg-white rounded-lg shadow-md p-8 mb-6">
         <div class="flex justify-between items-start mb-4">
-            <h1 class="text-3xl font-bold">{{ task.name }}</h1>
-            <span class="inline-block px-4 py-2 rounded-full text-sm font-bold
-                {% if task.status == 'new' %}bg-blue-200 text-blue-700
-                {% elif task.status == 'in_progress' %}bg-yellow-200 text-yellow-700
-                {% elif task.status == 'review' %}bg-purple-200 text-purple-700
-                {% elif task.status == 'done' %}bg-green-200 text-green-700
-                {% elif task.status == 'cancelled' %}bg-red-200 text-red-700
-                {% else %}bg-gray-200 text-gray-700{% endif %}">
-                <i class="fa-solid fa-circle-dot mr-1"></i>
-                {{ task.get_status_display }}
-            </span>
+            <div class="flex gap-md items-center">
+                <h1 class="text-3xl font-bold">{{ task.name }}</h1>
+                {% if user.username == task.creator.username %}
+                    <i class="text-xl fa-solid text-red-700 fa-trash hover:shadow-sm cursor-pointer hover:shadow-md rounded-full transition duration-300 ease-in-out" id="removeTask" data-task="{{ task.id }}"></i>
+                {% endif %}
+            </div>
+            <div class="inline-block px-4 py-2 rounded-full text-sm font-bold gap-md
+                    {% if task.status == 'in_progress' %}bg-yellow-200 text-yellow-700
+                    {% elif task.status == 'review' %}bg-purple-200 text-purple-700
+                    {% elif task.status == 'done' %}bg-green-200 text-green-700
+                    {% elif task.status == 'cancelled' %}bg-red-200 text-red-700
+                    {% else %}bg-gray-200 text-gray-700{% endif %}">
+                <span class="flex gap-sm items-center">
+                    <i class="fa-solid fa-circle-dot mr-1"></i>
+                    {{ task.get_status_display }}
+                    {% if user.username == task.creator.username %}
+                    <div class="relative inline-block">
+                        <div class="text-black-800 cursor-pointer hover:shadow-md rounded-sm transition duration-300 ease-in-out" id="changeStatus" data-task="{{ task.id }}">
+                            <i class="font-bold fa-regular fa-pen-to-square"></i>
+                        </div>
+                        <!-- Меню смены статуса -->
+                        <div id="statusMenu" class="hidden absolute right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg z-50">
+                            <div class="py-1">
+                                <div class="status-option px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm" data-status="in_progress">
+                                    <i class="fa-solid fa-play mr-2 text-yellow-600"></i>В работе
+                                </div>
+                                <div class="status-option px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm" data-status="review">
+                                    <i class="fa-solid fa-eye mr-2 text-purple-600"></i>На проверке
+                                </div>
+                                <div class="status-option px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm" data-status="done">
+                                    <i class="fa-solid fa-check mr-2 text-green-600"></i>Готово
+                                </div>
+                                <div class="status-option px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm" data-status="cancelled">
+                                    <i class="fa-solid fa-ban mr-2 text-red-600"></i>Отменено
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </span>
+            </div>
         </div>
         
-        <div class="text-gray-700 mb-6">
-            <h2 class="text-xl font-semibold mb-2">Описание</h2>
-            <p class="whitespace-pre-line">{{ task.description }}</p>
+        <div class="text-gray-700 mb-6 flex justify-between items-center">
+            <div class="flex flex-col">
+                <h2 class="text-xl font-semibold mb-2">Описание</h2>
+                <p class="whitespace-pre-line">{{ task.description }}</p>
+            </div>
+            <div class="flex flex-col">
+                <div class="flex gap-sm items-center">
+                    <h2 class="text-xl font-bold mb-2">Приоритет</h2>
+                    {% if user.username == task.creator.username %}
+                    <i id="changePriority" data-task="{{task.id}}" class="hover:shadow-md transition ease-in-out duration-300 rounded-full px-1 py-1 cursor-pointer fa-solid fa-sort"></i>
+                    {% endif %}
+                </div>
+                <p class="whitespace-pre-line text-end" id="priorityDisplay">{% if task.priority < 10000 %}{{task.priority}}{% else %}Не указан{% endif %}</p>
+            </div>
         </div>
         
         <div class="grid grid-cols-2 gap-4 mb-6">
@@ -35,9 +79,17 @@
                 <i class="fa-solid fa-user text-gray-400 mr-2"></i>
                 <strong>Создатель:</strong> {{ task.creator.first_name  }} {{ task.creator.last_name  }} ({{ task.creator.username  }})
             </div>
-            <div class="bg-gray-50 p-4 rounded-lg">
-                <i class="fa-solid fa-calendar text-gray-400 mr-2"></i>
-                <strong>Создана:</strong> {{ task.created_at|date:"d.m.Y H:i" }}
+            <div class="bg-gray-50 p-4 rounded-lg flex justify-between items-center">
+                <div class="">
+                    <i class="fa-solid fa-calendar text-gray-400 mr-2"></i>
+                    <strong>Создана:</strong> {{ task.created_at|date:"d.m.Y, H:i" }}
+                </div>
+                <div class="">
+                    <i class="text-gray-400 mr-2 fa-regular fa-alarm-clock"></i>
+                    <strong class="hover:drop-shadow-md cursor-pointer transition ease-in-out duration-300 transparent">Дедлайн:</strong> 
+                    <span id="deadlineDisplay">{{task.deadline | date:"d.m.Y, H:i"|default:"Не установлен"}}</span>
+                    <i class="fa-solid fa-pen-to-square text-blue-500 ml-2 cursor-pointer hover:text-blue-700 transition duration-300" id="changeDeadline" data-task="{{task.id}}"></i>
+                </div>
             </div>
         </div>
         
@@ -46,16 +98,27 @@
                 <i class="fa-solid fa-users text-gray-400 mr-2"></i>
                 Исполнители
             </h2>
-            {% if task.executor.all %}
-            <div class="flex flex-wrap gap-2">
+                {% if task.executor.all %}
+            <div class="flex flex-wrap gap-2 items-center">
                 {% for user in task.executor.all %}
-                <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">
-                    <i class="fa-solid fa-user-check mr-1"></i>{{ user.last_name }} ({{user.username}})
+                <span class="relative inline-flex items-center transition ease-in-out duration-300 bg-blue-100 text-blue-700 px-3 py-1 rounded-full group hover:pr-8 transition-padding">
+                    <i class="fa-solid fa-user-check mr-1"></i>
+                    {{ user.last_name }} ({{user.username}})
+
+                    <button class="remove-executor absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-transparent ease-in-out duration-300 border-none cursor-pointer text-blue-700 hover:text-blue-900 p-0" 
+                            data-task="{{task.id}}" 
+                            data-user="{{user.id}}"
+                            type="button">
+                        <i class="fa-solid fa-times"></i>
+                    </button>
                 </span>
                 {% endfor %}
+                <button class="px-2 bg-blue-100 cursor-pointer rounded-full py-1 hover:shadow-md transition duration-300 ease-in-out text-blue-700 hover:text-blue-900" id="addExecutor" type="button">
+                    <div class="">
+                        <i class="fa-solid fa-plus"></i>
+                    </div>
+                </button>
             </div>
-            {% else %}
-            <p class="text-gray-500">Исполнители не назначены</p>
             {% endif %}
         </div>
     </div>
@@ -117,4 +180,89 @@
         </form>
     </div>
 </div>
+
+<!-- Модальное окно добавления исполнителя -->
+<dialog id="executorModal" class="rounded-lg shadow-xl p-6 bg-white w-[400px] [&::backdrop]:bg-black/40">
+    <form id="executorForm">
+        <h2 class="text-xl font-bold mb-4 text-gray-800">Добавить исполнителя</h2>
+        <div class="mb-4">
+            <label for="executorUsername" class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+            <input type="text" 
+                   name="username" 
+                   id="executorUsername" 
+                   required 
+                   placeholder="Введите username пользователя"
+                   class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div id="executorFormErrors" class="hidden mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-sm"></div>
+        <div class="flex gap-2 justify-end">
+            <button type="button" id="cancelBtn-executor" 
+                    class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
+                Отмена
+            </button>
+            <button type="submit" 
+                    class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                Добавить
+            </button>
+        </div>
+    </form>
+</dialog>
+
+<!-- Модальное окно смены дедлайна -->
+<dialog id="deadlineModal" class="rounded-lg shadow-xl p-6 bg-white w-[400px] [&::backdrop]:bg-black/40">
+    <form id="deadlineForm">
+        <h2 class="text-xl font-bold mb-4 text-gray-800">Изменить дедлайн</h2>
+        <div class="mb-4">
+            <label for="deadlineInput" class="block text-sm font-medium text-gray-700 mb-2">Дата и время</label>
+            <input type="datetime-local" 
+                   name="deadline" 
+                   id="deadlineInput" 
+                   required 
+                   class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div id="deadlineFormErrors" class="hidden mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-sm"></div>
+        <div class="flex gap-2 justify-end">
+            <button type="button" id="cancelBtn-deadline" 
+                    class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
+                Отмена
+            </button>
+            <button type="submit" 
+                    class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                Сохранить
+            </button>
+        </div>
+    </form>
+</dialog>
+
+<!-- Модальное окно смены приоритета -->
+<dialog id="priorityModal" class="rounded-lg shadow-xl p-6 bg-white w-[400px] [&::backdrop]:bg-black/40">
+    <form id="priorityForm">
+        <h2 class="text-xl font-bold mb-4 text-gray-800">Изменить приоритет</h2>
+        <div class="mb-4">
+            <label for="priorityInput" class="block text-sm font-medium text-gray-700 mb-2">Приоритет (число)</label>
+            <input type="number" 
+                   name="priority" 
+                   id="priorityInput" 
+                   required 
+                   min="0"
+                   placeholder="Введите значение приоритета"
+                   class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div id="priorityFormErrors" class="hidden mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-sm"></div>
+        <div class="flex gap-2 justify-end">
+            <button type="button" id="cancelBtn-priority" 
+                    class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
+                Отмена
+            </button>
+            <button type="submit" 
+                    class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                Сохранить
+            </button>
+        </div>
+    </form>
+</dialog>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/tasks/details.js' %}"></script>
 {% endblock %}

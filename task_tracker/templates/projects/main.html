@@ -7,6 +7,9 @@
 
 {% block body %}
 <div class="p-8" id="mainContainer">
+    <div class="notification fixed bottom-4 right-4 min-w-[250px] max-w-md bg-blue-500 rounded-md text-center px-6 py-3 text-white shadow-lg transition-all duration-500 opacity-0 invisible pointer-events-none z-[9999]" id="notificationWindow">
+        <p id="notificationText"></p>
+    </div>
     <div class="flex justify-between items-center border-b-2 border-border-aaaa rounded-b-sm pb-2 font-bold">
         <h1 class="text-3xl mb-6">Все проекты</h1>
         <div class="px-2 py-1 bg-blue-500 rounded-lg text-white hover:bg-blue-600 transition-colors duration-200 cursor-pointer flex gap-sm items-center" id="addProject">
@@ -17,8 +20,54 @@
     {% if projects %}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {% for project in projects %}
-        <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
-            <h2 class="text-xl font-bold mb-2">{{ project.name }}</h2>
+        <div class="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow duration-200 relative">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold mb-2">{{ project.name }}</h2>
+                <div class="relative" id="actions-container-{{project.id}}">
+                    <button class="rounded-full hover:bg-[black]/10 hover:shadow-md transition-colors px-2 py-1 w-8 h-8 flex items-center justify-center" 
+                            id="actions-btn-{{project.id}}"
+                            data-project="{{project.id}}"
+                            type="button">
+                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                    </button>
+
+                    <div class="hidden absolute right-0 top-10 w-56 bg-white rounded-lg shadow-lg z-50 border border-gray-200" 
+                         id="actions-menu-{{project.id}}">
+                        <button class="action-item w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
+                                data-action="add-participant">
+                            <i class="fa-solid fa-people-group"></i>
+                            Добавить участника
+                        </button>
+
+                        <div class="relative group/sub">
+                            <button class="action-item w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 justify-between"
+                                    data-action="change-status"
+                                    type="button">
+                                <span class="flex items-center gap-2">
+                                    <i class="fa-solid fa-bars-progress"></i>
+                                    Сменить статус
+                                </span>
+                                <i class="fa-solid fa-chevron-right text-xs"></i>
+                            </button>
+
+                            <div class="hidden group-hover/sub:block absolute right-full top-0 ml-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
+                                 id="status-menu-{{project.id}}">
+                                <button class="status-option w-full text-left px-4 py-2 hover:bg-gray-100" data-status="draft">Черновик</button>
+                                <button class="status-option w-full text-left px-4 py-2 hover:bg-gray-100" data-status="active">В работе</button>
+                                <button class="status-option w-full text-left px-4 py-2 hover:bg-gray-100" data-status="completed">Завершён</button>
+                                <button class="status-option w-full text-left px-4 py-2 hover:bg-gray-100" data-status="archived">Архив</button>
+                            </div>
+                        </div>
+
+                        <button class="action-item w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-red-600 hover:text-red-700"
+                                data-action="delete"
+                                {% if project.creator.username != user.username %}pointer-events-none class="bg-[black]/90 cursor-not-allowed"{% endif %}>
+                            <i class="fa-solid fa-trash"></i>
+                            Удалить
+                        </button>
+                    </div>
+                </div>
+            </div>
             <p class="text-gray-600 mb-4">{{ project.description|truncatewords:20 }}</p>
             
             <div class="text-sm text-gray-500 mb-2">
@@ -66,6 +115,9 @@
     </div>
     {% endif %}
 </div>
+
+
+
 <dialog id="projectModal" class="rounded-lg shadow-xl p-6 bg-white w-[600px] [&::backdrop]:bg-black/50">
     <form id="projectForm">
         <h2 class="text-xl font-bold mb-4">Создать проект</h2>
@@ -92,7 +144,7 @@
         <div id="formErrors" class="hidden mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded"></div>
         
         <div class="flex gap-2 justify-end">
-            <button type="button" id="cancelBtn" 
+            <button type="button" id="cancelBtn-project" 
                     class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition-colors">
                 Отмена
             </button>
@@ -103,9 +155,27 @@
         </div>
     </form>
 </dialog>
+
+<dialog id="addMember" class="rounded-lg shadow-xl p-6 bg-white w-[600px] [&::backdrop]:bg-black/50">
+    <form id="memberForm">
+        <h2 class="text-xl font-bold mb-4">Добавить участника в проект</h2>
+        <div class="flex justify-between gap-md">
+            <input class="flex-1 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors" type="text" required name="usernames"
+                   placeholder="Имя пользователя">
+            <div class="flex gap-sm">
+                <input type="submit" value="Добавить" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
+                <button type="button" id="cancelBtn-member" 
+                        class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition-colors">
+                    Отмена
+                </button>
+            </div>
+        </div>
+        <div id="memberFormErrors" class="hidden mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded"></div>
+    </form>
+</dialog>
 {% endblock %}
 
 
 {% block scripts %}
-<script src="{% static 'js/projects/script.js' %}"></script>
+<script src="{% static 'js/projects/main.js' %}"></script>
 {% endblock %}
