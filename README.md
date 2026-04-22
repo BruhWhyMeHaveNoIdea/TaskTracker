@@ -218,10 +218,3 @@ docker-compose run tailwind npm run build
 - **API**: Django REST Framework
 - **Контейнеризация**: Docker, Docker Compose
 
-## 📝 Лицензия
-
-[Укажите лицензию вашего проекта]
-
-## 👥 Контакты
-
-[Укажите контактную информацию]
