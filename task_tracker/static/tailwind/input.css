@@ -1,3 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    body {
+        @apply bg-app text-slate-200 antialiased;
+    }
+
+    /* Тёмный скроллбар */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+        background: #0d0c1a;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #2d2b4a;
+        border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #3d3b5a;
+    }
+
+    /* Стилизация стандартных инпутов под тёмную тему */
+    input[type="text"],
+    input[type="password"],
+    input[type="email"],
+    input[type="number"],
+    input[type="datetime-local"],
+    textarea,
+    select {
+        @apply bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-colors;
+    }
+
+    select option {
+        @apply bg-surface text-slate-200;
+    }
+}
+
+@layer components {
+    /* Тёмная карточка в стиле лендинга */
+    .card-dark {
+        @apply bg-white/[0.03] border border-white/[0.06] rounded-lg backdrop-blur-sm;
+    }
+
+    /* Градиентная кнопка (как на лендинге) */
+    .btn-gradient {
+        @apply bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium rounded-lg transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25;
+    }
+}

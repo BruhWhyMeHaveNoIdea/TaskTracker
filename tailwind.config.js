@@ -11,6 +11,12 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        app: {
+          DEFAULT: '#0d0c1a',
+        },
+        surface: {
+          DEFAULT: '#151428',
+        },
         sidebar: {
           aaaa: {
             DEFAULT: '#19182c',
@@ -27,21 +33,21 @@ module.exports = {
         },
 
         text: {
-          error: '#430505'
+          error: '#ef4444'
         },
 
         background: {
           cards: '#000000'
         },
-        'card-bg': '#ffffff',
-        'card-border': '#e2e8f0',
-        'text-primary': '#1e293b',
-        'text-secondary': '#64748b',
+        'card-bg': '#16152a',
+        'card-border': '#2d2b4a',
+        'text-primary': '#f1f5f9',
+        'text-secondary': '#94a3b8',
         'primary': '#3b82f6'
       },
 
       fontFamily: {
-        comic: ['Comic Sans MS', 'cursive', 'sans-serif'], 
+        comic: ['Inter', 'system-ui', 'sans-serif'],
       },
 
       width: {

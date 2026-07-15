@@ -16,45 +16,55 @@ function showMenu() {
     const accountText = document.getElementById("accountText")
     const projectText = document.getElementById("projectText")
     const taskText = document.getElementById("taskText")
+    const mainText = document.getElementById("mainText")
+
+    const textElements = [accountText, projectText, taskText, mainText]
 
     const savedState = localStorage.getItem('menuCollapsed');
     const isCollapsed = savedState === 'true';
 
+    textElements.forEach(el => {
+        el.style.transition = 'none'
+        el.style.opacity = isCollapsed ? '0' : '1'
+    })
+    // Возвращаем transition для последующих кликов
+    requestAnimationFrame(() => {
+        textElements.forEach(el => el.style.transition = '')
+    })
+
     if (isCollapsed) {
         menu.classList.add("closed");
         menu.style.width = '60px';
-        accountText.innerText = "";
-        projectText.innerText = "";
-        taskText.innerText = "";
     } else {
         menu.classList.remove("closed");
         menu.style.width = '200px';
-        accountText.innerText = "Аккаунт";
-        projectText.innerText = "Проекты";
-        taskText.innerText = "Задачи";
     }
 
     menuButton.addEventListener("click", function() {
         const isNowCollapsed = menu.classList.contains("closed");
         if (isNowCollapsed) {
+            // Разворачивание: меню расширяется, текст плавно появляется
             menu.classList.remove("closed")
-
             menu.style.width = '200px'
-            accountText.innerText = "Аккаунт"
-            projectText.innerText = "Проекты"
-            taskText.innerText = "Задачи"
+
+            setTimeout(() => {
+                textElements.forEach(el => el.style.opacity = '1')
+            }, 150)
 
             localStorage.setItem('menuCollapsed', 'false');
         } else {
-            menu.classList.add("closed")
-
+            // Сворачивание: текст плавно гаснет одновременно с сужением меню
+            textElements.forEach(el => el.style.opacity = '0')
             menu.style.width = '60px'
-            accountText.innerText = ""
-            projectText.innerText = ""
-            taskText.innerText = ""
+            menu.classList.add("closed")
 
             localStorage.setItem('menuCollapsed', 'true');
         }
+    })
+
+    // Клик по "Task Tracker" — переход на главную, без toggle меню
+    mainText.addEventListener("click", function(e) {
+        e.stopPropagation();
     })
 }
 

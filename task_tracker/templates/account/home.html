@@ -7,7 +7,11 @@
         <div class="flex justify-between items-center border-b-2 border-border-aaaa rounded-b-sm pb-2 font-bold">
             <div class="text-3xl mb-6 flex gap-sm">
                 <p class="">Добро пожаловать,</p>
-                <p class="font-bold">{{user.first_name}} {{user.last_name}}</p>
+                {% if user.first_name and user.last_name %}
+                    <p class="font-bold">{{user.first_name}} {{user.last_name}}</p>
+                {% else %}
+                    <p class="font-bold">Пользователь</p>
+                {% endif %}
             </div>
             <div class="flex gap-lg items-center justify-center">
                 <div class="text-lg shadow-sm rounded-md">
@@ -21,8 +25,154 @@
                 </div>
             </div>
         </div>
-        <div class="flex mx-3 my-4">
-            <p class="">чета придумать</p>
+        <div class="flex flex-col gap-6 mt-6">
+
+            <!-- Stats Row -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- In Progress -->
+                <div class="card-dark p-5 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-yellow-500/15 border border-yellow-500/20 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-spinner text-yellow-400 text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-bold text-slate-100">{{ stats.in_progress }}</p>
+                        <p class="text-slate-500 text-sm">В работе</p>
+                    </div>
+                </div>
+                <!-- Review -->
+                <div class="card-dark p-5 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/15 border border-purple-500/20 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-eye text-purple-400 text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-bold text-slate-100">{{ stats.review }}</p>
+                        <p class="text-slate-500 text-sm">На проверке</p>
+                    </div>
+                </div>
+                <!-- Done -->
+                <div class="card-dark p-5 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-green-500/15 border border-green-500/20 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-check text-green-400 text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-bold text-slate-100">{{ stats.done }}</p>
+                        <p class="text-slate-500 text-sm">Выполнено</p>
+                    </div>
+                </div>
+                <!-- Overdue -->
+                <div class="card-dark p-5 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-red-500/15 border border-red-500/20 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-triangle-exclamation text-red-400 text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-bold text-slate-100">{{ stats.overdue }}</p>
+                        <p class="text-slate-500 text-sm">Просрочено</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Two-column layout: Deadlines + Projects -->
+            <div class="grid lg:grid-cols-2 gap-6">
+
+                <!-- Upcoming Deadlines -->
+                <div class="card-dark p-6">
+                    <div class="flex items-center justify-between mb-5">
+                        <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+                            <i class="fa-solid fa-clock text-blue-400"></i>
+                            Ближайшие дедлайны
+                        </h2>
+                        <a href="{% url 'tasks:list' %}" class="text-blue-400 text-sm hover:text-blue-300 transition-colors">Все задачи</a>
+                    </div>
+
+                    {% if upcoming_tasks %}
+                    <div class="flex flex-col gap-3">
+                        {% for task in upcoming_tasks %}
+                        <a href="{% url 'tasks:detail' task.id %}" class="bg-white/[0.03] border border-white/[0.06] rounded-lg p-4 flex items-center justify-between gap-4 hover:bg-white/[0.06] transition-colors group">
+                            <div class="flex items-center gap-3 min-w-0 flex-1">
+                                <div class="w-9 h-9 rounded-lg bg-blue-500/15 flex items-center justify-center flex-shrink-0">
+                                    <i class="fa-solid fa-list-check text-blue-400 text-sm"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="font-medium text-slate-200 text-sm truncate group-hover:text-white transition-colors">{{ task.name }}</p>
+                                    {% if task.project %}
+                                    <p class="text-slate-500 text-xs mt-0.5">{{ task.project.name }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 flex-shrink-0">
+                                {% if task.priority < 10000 %}
+                                <span class="text-[10px] font-bold px-2 py-1 rounded-full
+                                    {% if task.priority <= 3 %}bg-red-500/15 text-red-400 border border-red-500/20
+                                    {% elif task.priority <= 7 %}bg-yellow-500/15 text-yellow-400 border border-yellow-500/20
+                                    {% else %}bg-green-500/15 text-green-400 border border-green-500/20{% endif %}">
+                                    P{{ task.priority }}
+                                </span>
+                                {% endif %}
+                                <span class="text-xs text-slate-400 flex items-center gap-1 whitespace-nowrap">
+                                    <i class="fa-regular fa-calendar"></i>
+                                    {{ task.deadline|date:"d.m H:i" }}
+                                </span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-10">
+                        <i class="fa-solid fa-calendar-check text-4xl text-slate-600 mb-3"></i>
+                        <p class="text-slate-500">Нет ближайших дедлайнов</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- My Projects -->
+                <div class="card-dark p-6">
+                    <div class="flex items-center justify-between mb-5">
+                        <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+                            <i class="fa-solid fa-diagram-project text-purple-400"></i>
+                            Мои проекты
+                        </h2>
+                        <a href="{% url 'projects:list' %}" class="text-blue-400 text-sm hover:text-blue-300 transition-colors">Все проекты</a>
+                    </div>
+
+                    {% if my_projects %}
+                    <div class="grid sm:grid-cols-2 gap-3">
+                        {% for project in my_projects %}
+                        <a href="{% url 'projects:detail' project.id %}" class="bg-white/[0.03] border border-white/[0.06] rounded-lg p-4 hover:bg-white/[0.06] transition-colors group">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="w-9 h-9 rounded-lg bg-purple-500/15 flex items-center justify-center flex-shrink-0">
+                                    <i class="fa-solid fa-folder text-purple-400 text-sm"></i>
+                                </div>
+                                <span class="text-[10px] font-semibold px-2 py-1 rounded-full
+                                    {% if project.status == 'draft' %}bg-white/[0.08] text-slate-400 border border-white/[0.1]
+                                    {% elif project.status == 'active' %}bg-green-500/15 text-green-400 border border-green-500/20
+                                    {% elif project.status == 'completed' %}bg-blue-500/15 text-blue-400 border border-blue-500/20
+                                    {% elif project.status == 'archived' %}bg-red-500/15 text-red-400 border border-red-500/20{% endif %}">
+                                    {{ project.get_status_display }}
+                                </span>
+                            </div>
+                            <p class="font-medium text-slate-200 text-sm truncate group-hover:text-white transition-colors mb-2">{{ project.name }}</p>
+                            <div class="flex items-center gap-3 text-xs text-slate-500">
+                                <span class="flex items-center gap-1">
+                                    <i class="fa-solid fa-list-check"></i>
+                                    {{ project.tasks.count }}
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <i class="fa-solid fa-users"></i>
+                                    {{ project.participants.count }}
+                                </span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-10">
+                        <i class="fa-solid fa-folder-open text-4xl text-slate-600 mb-3"></i>
+                        <p class="text-slate-500">Вы пока не участвуете в проектах</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+            </div>
         </div>
     </div>
 </div>

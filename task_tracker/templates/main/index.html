@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Tracker — Управление задачами и проектами</title>
+    <link rel="stylesheet" href="/static/tailwind/output.css">
+    <link rel="stylesheet" href="/static/FAS/css/all.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .gradient-hero {
+            background: linear-gradient(135deg, #19182c 0%, #2d2b55 50%, #19182c 100%);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa, #a78bfa, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .gradient-text-green {
+            background: linear-gradient(135deg, #34d399, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .card-glow {
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-glow:hover {
+            box-shadow: 0 0 60px rgba(59, 130, 246, 0.15), 0 20px 40px rgba(0, 0, 0, 0.12);
+            transform: translateY(-6px);
+        }
+
+        .feature-icon {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(168, 85, 247, 0.1));
+            border: 1px solid rgba(59, 130, 246, 0.15);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 8px 30px rgba(59, 130, 246, 0.45);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            border: 1.5px solid rgba(255, 255, 255, 0.25);
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline:hover {
+            border-color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        .task-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(10px);
+        }
+
+        .priority-high {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        .priority-medium {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .priority-low {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .status-badge {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .stat-number {
+            background: linear-gradient(135deg, #ffffff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-link {
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #3b82f6, #a78bfa);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-12px); }
+        }
+
+        .animate-float-delay {
+            animation: float 6s ease-in-out infinite;
+            animation-delay: -3s;
+        }
+    </style>
+</head>
+<body class="bg-[#0d0c1a] text-white min-h-screen">
+
+    
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-[#0d0c1a]/80 backdrop-blur-xl border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                        <i class="fa-solid fa-check-double text-white text-sm"></i>
+                    </div>
+                    <span class="text-lg font-bold">Task Tracker</span>
+                </div>
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="#features" class="nav-link text-sm text-gray-400 hover:text-white transition-colors">Возможности</a>
+                    <a href="#demo" class="nav-link text-sm text-gray-400 hover:text-white transition-colors">Демо</a>
+                    <a href="#about" class="nav-link text-sm text-gray-400 hover:text-white transition-colors">О проекте</a>
+                </div>
+                <div class="flex items-center gap-3">
+                    <a href="/account/login/" class="btn-outline px-5 py-2 rounded-lg text-sm font-medium text-white">
+                        Войти
+                    </a>
+                    <a href="/account/register/" class="btn-primary px-5 py-2 rounded-lg text-sm font-medium text-white">
+                        Регистрация
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    
+    <section class="gradient-hero relative pt-32 pb-20 lg:pt-40 lg:pb-28 overflow-hidden">
+        
+        <div class="blob w-[500px] h-[500px] bg-blue-500 -top-40 -right-40"></div>
+        <div class="blob w-[400px] h-[400px] bg-purple-500 bottom-0 -left-20"></div>
+
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                
+                <div>
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 mb-6">
+                        <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+                        <span class="text-xs font-medium text-blue-300">Open Source проект</span>
+                    </div>
+
+                    <h1 class="text-4xl lg:text-5xl xl:text-6xl font-black leading-tight mb-6">
+                        Управляйте
+                        <span class="gradient-text"> задачами</span>
+                        <br>и проектами
+                        <br>эффективно
+                    </h1>
+
+                    <p class="text-gray-400 text-lg leading-relaxed mb-8 max-w-lg">
+                        Современная система трекинга задач с проектами, назначением исполнителей, приоритетами, дедлайнами и комментариями. Идеально для командной работы.
+                    </p>
+
+                    <div class="flex flex-wrap gap-4">
+                        <a href="/account/register/" class="btn-primary px-8 py-3.5 rounded-xl text-base font-semibold text-white inline-flex items-center gap-2">
+                            <i class="fa-solid fa-rocket text-sm"></i>
+                            Начать бесплатно
+                        </a>
+                        <a href="#demo" class="btn-outline px-8 py-3.5 rounded-xl text-base font-semibold text-white inline-flex items-center gap-2">
+                            <i class="fa-solid fa-eye text-sm"></i>
+                            Смотреть демо
+                        </a>
+                    </div>
+
+                    
+                    <div class="flex gap-8 mt-10 pt-8 border-t border-white/5">
+                        <div>
+                            <div class="stat-number text-2xl font-bold">6+</div>
+                            <div class="text-gray-500 text-sm mt-1">Функций</div>
+                        </div>
+                        <div>
+                            <div class="stat-number text-2xl font-bold">4</div>
+                            <div class="text-gray-500 text-sm mt-1">Статуса задач</div>
+                        </div>
+                        <div>
+                            <div class="stat-number text-2xl font-bold">∞</div>
+                            <div class="text-gray-500 text-sm mt-1">Возможностей</div>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="relative">
+                    
+                    <div class="task-card rounded-2xl p-6 relative animate-float">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-2">
+                                <span class="status-badge text-xs font-semibold px-3 py-1 rounded-full">В работе</span>
+                                <span class="priority-high text-white text-[10px] font-bold px-2.5 py-1 rounded-full">ВЫСОКИЙ</span>
+                            </div>
+                            <span class="text-gray-500 text-xs">
+                                <i class="fa-regular fa-clock mr-1"></i>15.07.2026
+                            </span>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Разработка главной страницы</h3>
+                        <p class="text-gray-400 text-sm mb-4">Создать лендинг с Tailwind CSS для портфолио</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-[10px] font-bold">W</div>
+                                <span class="text-xs text-gray-400">Walkerin</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 text-gray-500 text-xs">
+                                <i class="fa-regular fa-comment"></i>
+                                <span>3</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="task-card rounded-2xl p-5 mt-4 ml-8 relative animate-float-delay">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="status-badge text-xs font-semibold px-3 py-1 rounded-full">Новая</span>
+                                <span class="priority-medium text-white text-[10px] font-bold px-2.5 py-1 rounded-full">СРЕДНИЙ</span>
+                            </div>
+                            <span class="text-gray-500 text-xs">18.07.2026</span>
+                        </div>
+                        <h3 class="text-base font-bold mb-1.5">Интеграция API</h3>
+                        <p class="text-gray-400 text-xs mb-3">Подключить REST API для синхронизации данных</p>
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 rounded-full bg-gradient-to-br from-green-400 to-teal-500 flex items-center justify-center text-[9px] font-bold">A</div>
+                            <div class="w-6 h-6 rounded-full bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center text-[9px] font-bold">M</div>
+                            <span class="text-xs text-gray-500 ml-1">+2 участника</span>
+                        </div>
+                    </div>
+
+                    
+                    <div class="absolute -top-4 -right-4 bg-green-500/20 border border-green-500/30 rounded-xl px-4 py-2 animate-float-delay">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-check-circle text-green-400 text-sm"></i>
+                            <span class="text-green-300 text-xs font-semibold">Задача закрыта!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <section id="features" class="py-20 lg:py-28 relative">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-blue-400 text-sm font-semibold tracking-wider uppercase">Возможности</span>
+                <h2 class="text-3xl lg:text-4xl font-black mt-3 mb-4">
+                    Всё что нужно для <span class="gradient-text-green">управления</span>
+                </h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">
+                    Мощные инструменты для планирования, отслеживания и выполнения задач в команде
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <div class="card-glow bg-white/[0.02] border border-white/[0.06] rounded-2xl p-7">
+                    <div class="feature-icon w-14 h-14 rounded-xl flex items-center justify-center mb-5">
+                        <i class="fa-solid fa-diagram-project text-blue-400 text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Проекты</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">Создавайте проекты, приглашайте участников и управляйте ими с гибкими статусами и настройками</p>
+                </div>
+
+                
+                <div class="card-glow bg-white/[0.02] border border-white/[0.06] rounded-2xl p-7">
+                    <div class="feature-icon w-14 h-14 rounded-xl flex items-center justify-center mb-5">
+                        <i class="fa-solid fa-list-check text-purple-400 text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Управление задачами</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">Создавайте задачи, назначайте исполнителей и отслеживайте прогресс в реальном времени</p>
+                </div>
+
+                
+                <div class="card-glow bg-white/[0.02] border border-white/[0.06] rounded-2xl p-7">
+                    <div class="feature-icon w-14 h-14 rounded-xl flex items-center justify-center mb-5">
+                        <i class="fa-solid fa-flag text-red-400 text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Приоритеты</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">Устанавливайте приоритеты задачам — высокий, средний или низкий — для правильной очередности</p>
+                </div>
+
+                
+                <div class="card-glow bg-white/[0.02] border border-white/[0.06] rounded-2xl p-7">
+                    <div class="feature-icon w-14 h-14 rounded-xl flex items-center justify-center mb-5">
+                        <i class="fa-regular fa-calendar-check text-yellow-400 text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Дедлайны</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">Задавайте точные сроки выполнения задач с датой и временем для эффективного планирования</p>
+                </div>
+
+                
+                <div class="card-glow bg-white/[0.02] border border-white/[0.06] rounded-2xl p-7">
+                    <div class="feature-icon w-14 h-14 rounded-xl flex items-center justify-center mb-5">
+                        <i class="fa-solid fa-comments text-green-400 text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Комментарии</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">Обсуждайте задачи с командой прямо в карточке задачи — вся коммуникация в одном месте</p>
+                </div>
+
+                
+                <div class="card-glow bg-white/[0.02] border border-white/[0.06] rounded-2xl p-7">
+                    <div class="feature-icon w-14 h-14 rounded-xl flex items-center justify-center mb-5">
+                        <i class="fa-solid fa-users text-pink-400 text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Командная работа</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">Несколько исполнителей на задаче, участники в проектах — идеальная координация команды</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <section id="demo" class="py-20 lg:py-28 relative overflow-hidden">
+        <div class="blob w-[400px] h-[400px] bg-purple-600 top-20 right-0"></div>
+
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative">
+            <div class="text-center mb-16">
+                <span class="text-purple-400 text-sm font-semibold tracking-wider uppercase">Демо</span>
+                <h2 class="text-3xl lg:text-4xl font-black mt-3 mb-4">
+                    Посмотрите <span class="gradient-text">в действии</span>
+                </h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">
+                    Интерфейс приложения для управления задачами и проектами
+                </p>
+            </div>
+
+            
+            <div class="card-glow bg-white/[0.02] border border-white/[0.06] rounded-2xl overflow-hidden max-w-5xl mx-auto">
+                
+                <div class="bg-[#151428] px-5 py-3 flex items-center gap-3 border-b border-white/5">
+                    <div class="flex gap-1.5">
+                        <div class="w-3 h-3 rounded-full bg-red-500/70"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-500/70"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-500/70"></div>
+                    </div>
+                    <div class="flex-1 bg-white/5 rounded-lg px-4 py-1.5 text-xs text-gray-500 text-center">
+                        <i class="fa-solid fa-lock text-[10px] mr-1.5 text-green-500/70"></i>
+                        localhost:8000/tasks
+                    </div>
+                </div>
+
+                
+                <div class="p-8 lg:p-10">
+                    <div class="flex items-center justify-between mb-8">
+                        <div>
+                            <h3 class="text-xl font-bold">Мои задачи</h3>
+                            <p class="text-gray-500 text-sm mt-1">Все задачи, где вы участвуете</p>
+                        </div>
+                        <button class="btn-primary px-5 py-2.5 rounded-xl text-sm font-semibold text-white inline-flex items-center gap-2">
+                            <i class="fa-solid fa-plus text-xs"></i>
+                            Новая задача
+                        </button>
+                    </div>
+
+                    
+                    <div class="space-y-3">
+                        
+                        <div class="task-card rounded-xl p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+                            <div class="flex items-center gap-4 flex-1">
+                                <div class="w-10 h-10 rounded-lg bg-blue-500/15 flex items-center justify-center flex-shrink-0">
+                                    <i class="fa-solid fa-code text-blue-400 text-sm"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-sm">Разработка главной страницы</h4>
+                                    <p class="text-gray-500 text-xs mt-0.5">Проект: Лендинг</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="status-badge text-[11px] font-semibold px-2.5 py-1 rounded-full">В работе</span>
+                                <span class="priority-high text-white text-[10px] font-bold px-2 py-1 rounded-full">ВЫСОКИЙ</span>
+                                <span class="text-gray-500 text-xs flex items-center gap-1">
+                                    <i class="fa-regular fa-calendar"></i>15.07
+                                </span>
+                                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-[10px] font-bold">
+                                    W
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div class="task-card rounded-xl p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+                            <div class="flex items-center gap-4 flex-1">
+                                <div class="w-10 h-10 rounded-lg bg-green-500/15 flex items-center justify-center flex-shrink-0">
+                                    <i class="fa-solid fa-database text-green-400 text-sm"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-sm">Настройка базы данных</h4>
+                                    <p class="text-gray-500 text-xs mt-0.5">Проект: Backend API</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="status-badge text-[11px] font-semibold px-2.5 py-1 rounded-full">Новая</span>
+                                <span class="priority-medium text-white text-[10px] font-bold px-2 py-1 rounded-full">СРЕДНИЙ</span>
+                                <span class="text-gray-500 text-xs flex items-center gap-1">
+                                    <i class="fa-regular fa-calendar"></i>20.07
+                                </span>
+                                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-green-400 to-teal-500 flex items-center justify-center text-[10px] font-bold">
+                                    A
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div class="task-card rounded-xl p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+                            <div class="flex items-center gap-4 flex-1">
+                                <div class="w-10 h-10 rounded-lg bg-yellow-500/15 flex items-center justify-center flex-shrink-0">
+                                    <i class="fa-solid fa-palette text-yellow-400 text-sm"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-sm">Дизайн системы уведомлений</h4>
+                                    <p class="text-gray-500 text-xs mt-0.5">Проект: Уведомления</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="status-badge text-[11px] font-semibold px-2.5 py-1 rounded-full">В работе</span>
+                                <span class="priority-low text-white text-[10px] font-bold px-2 py-1 rounded-full">НИЗКИЙ</span>
+                                <span class="text-gray-500 text-xs flex items-center gap-1">
+                                    <i class="fa-regular fa-calendar"></i>25.07
+                                </span>
+                                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center text-[10px] font-bold">
+                                    M
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div class="task-card rounded-xl p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+                            <div class="flex items-center gap-4 flex-1">
+                                <div class="w-10 h-10 rounded-lg bg-purple-500/15 flex items-center justify-center flex-shrink-0">
+                                    <i class="fa-solid fa-shield-halved text-purple-400 text-sm"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-sm">Аутентификация пользователей</h4>
+                                    <p class="text-gray-500 text-xs mt-0.5">Проект: Безопасность</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-green-500/15 text-green-400 border border-green-500/20">Завершена</span>
+                                <span class="priority-high text-white text-[10px] font-bold px-2 py-1 rounded-full">ВЫСОКИЙ</span>
+                                <span class="text-gray-500 text-xs flex items-center gap-1">
+                                    <i class="fa-regular fa-calendar"></i>10.07
+                                </span>
+                                <div class="flex -space-x-2">
+                                    <div class="w-7 h-7 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-[10px] font-bold border-2 border-[#0d0c1a]">
+                                        W
+                                    </div>
+                                    <div class="w-7 h-7 rounded-full bg-gradient-to-br from-green-400 to-teal-500 flex items-center justify-center text-[10px] font-bold border-2 border-[#0d0c1a]">
+                                        A
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <section id="about" class="py-20 lg:py-28 relative">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <div>
+                    <span class="text-pink-400 text-sm font-semibold tracking-wider uppercase">Технологии</span>
+                    <h2 class="text-3xl lg:text-4xl font-black mt-3 mb-6">
+                        Современный <span class="gradient-text">стек технологий</span>
+                    </h2>
+                    <p class="text-gray-400 leading-relaxed mb-8">
+                        Проект построен на Django — надёжном фреймворке с мощной ORM, встроенной системой аутентификации и REST API. Интерфейс реализован с помощью Tailwind CSS для адаптивности и красоты.
+                    </p>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center">
+                                <i class="fa-brands fa-python text-green-400 text-lg"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold">Django + Python</h4>
+                                <p class="text-gray-500 text-sm">Backend с ORM и аутентификацией</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
+                                <i class="fa-solid fa-wind text-cyan-400 text-lg"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold">Tailwind CSS</h4>
+                                <p class="text-gray-500 text-sm">Современный UI с адаптивным дизайном</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+                                <i class="fa-solid fa-server text-blue-400 text-lg"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold">Docker</h4>
+                                <p class="text-gray-500 text-sm">Контейнеризация для простого деплоя</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <div class="card-glow bg-white/[0.02] border border-white/[0.06] rounded-2xl p-8">
+                        <h3 class="text-lg font-bold mb-6">Стек технологий</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 text-center">
+                                <i class="fa-brands fa-python text-3xl text-green-400 mb-2"></i>
+                                <p class="text-sm font-medium">Python</p>
+                            </div>
+                            <div class="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 text-center">
+                                <i class="fa-brands fa-docker text-3xl text-blue-400 mb-2"></i>
+                                <p class="text-sm font-medium">Docker</p>
+                            </div>
+                            <div class="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 text-center">
+                                <i class="fa-solid fa-database text-3xl text-yellow-400 mb-2"></i>
+                                <p class="text-sm font-medium">PostgreSQL</p>
+                            </div>
+                            <div class="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 text-center">
+                                <i class="fa-solid fa-wind text-3xl text-cyan-400 mb-2"></i>
+                                <p class="text-sm font-medium">Tailwind</p>
+                            </div>
+                            <div class="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 text-center">
+                                <i class="fa-solid fa-plug text-3xl text-purple-400 mb-2"></i>
+                                <p class="text-sm font-medium">REST API</p>
+                            </div>
+                            <div class="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 text-center">
+                                <i class="fa-solid fa-shield-halved text-3xl text-red-400 mb-2"></i>
+                                <p class="text-sm font-medium">Auth</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <section class="py-20 relative">
+        <div class="max-w-4xl mx-auto px-6 lg:px-8">
+            <div class="card-glow bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-white/[0.08] rounded-3xl p-12 text-center relative overflow-hidden">
+                <div class="blob w-[300px] h-[300px] bg-blue-500 top-0 right-0"></div>
+
+                <div class="relative">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center mx-auto mb-6">
+                        <i class="fa-solid fa-check-double text-white text-2xl"></i>
+                    </div>
+                    <h2 class="text-3xl lg:text-4xl font-black mb-4">Готовы начать?</h2>
+                    <p class="text-gray-400 text-lg mb-8 max-w-lg mx-auto">
+                        Зарегистрируйтесь и начните управлять задачами вашей команды уже сегодня
+                    </p>
+                    <div class="flex flex-wrap justify-center gap-4">
+                        <a href="/account/register/" class="btn-primary px-8 py-3.5 rounded-xl text-base font-semibold text-white inline-flex items-center gap-2">
+                            <i class="fa-solid fa-user-plus text-sm"></i>
+                            Создать аккаунт
+                        </a>
+                        <a href="/account/login/" class="btn-outline px-8 py-3.5 rounded-xl text-base font-semibold text-white inline-flex items-center gap-2">
+                            <i class="fa-solid fa-right-to-bracket text-sm"></i>
+                            Войти
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <footer class="border-t border-white/5 py-10">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                        <i class="fa-solid fa-check-double text-white text-xs"></i>
+                    </div>
+                    <span class="font-bold">Task Tracker</span>
+                </div>
+                <div class="text-gray-500 text-sm flex flex-col items-center">
+                    <p class="">
+                        &copy; 2026 Task Tracker. Сделано с <i class="fa-solid fa-heart text-red-400 text-xs"></i> для продуктивной работы
+                    </p>
+                    <p class="text-[#0d0d1a]">
+                        Walkerin
+                    </p>
+                </div>
+                <div class="flex gap-4">
+                    <a href="https://github.com/BruhWhyMeHaveNoIdea/TaskTracker/" class="text-gray-500 hover:text-white transition-colors">
+                        <i class="fa-brands fa-github text-lg"></i>
+                    </a>
+                    <a href="https://t.me/Walkerin" class="text-gray-500 hover:text-white transition-colors">
+                        <i class="fa-brands fa-telegram text-lg"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

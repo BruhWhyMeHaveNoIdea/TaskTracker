@@ -14,10 +14,11 @@
     </head>
     <body class="font-comic">
         <div class="flex">
-            <div class="bg-sidebar-aaaa text-sidebar-aaaa-text transition-all duration-300 ease-in-out min-h-screen flex flex-col gap-2 text-md shadow-md"
+            <div class="closed bg-sidebar-aaaa text-sidebar-aaaa-text transition-all duration-300 ease-in-out min-h-screen flex flex-col gap-2 text-md shadow-md overflow-hidden"
                  id="menu">
-                <div class="flex items-center justify-start px-5 py-3 hover:bg-white/10 transition-colors duration-200 cursor-pointer" id="menuButton">
+                <div class="flex items-center gap-md justify-start px-5 py-3 hover:bg-white/10 transition-colors duration-200 cursor-pointer" id="menuButton">
                     <i class="fa-solid fa-grip-lines text-lg"></i>
+                    <a href="/" id="mainText" class="text-md font-bold whitespace-nowrap transition-opacity duration-300 hover:text-blue-400">Task Tracker</a>
                 </div>
                 <div class="flex flex-col font-bold text-sm">
                     <div class="link hover:bg-sidebar-aaaa-onhover text-center h-12 transition-colors duration-200 flex gap-4 items-center justify-start px-5 cursor-pointer" data-url='/account/home'>
